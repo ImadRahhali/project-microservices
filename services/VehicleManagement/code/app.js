@@ -1,20 +1,21 @@
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
-const axios = require('axios'); // Import axios for HTTP requests
+const axios = require('axios');
+require('dotenv').config(); // Load environment variables
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use PORT from .env file
 
 // Middleware to parse JSON request bodies
 app.use(bodyParser.json());
 
 // MySQL database connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',              // Change this based on your MySQL user
-  password: 'root',      // Replace with your MySQL password
-  database: 'vehicle_management'
+  host: process.env.DB_HOST,         // Use DB_HOST from .env file
+  user: process.env.DB_USER,         // Use DB_USER from .env file
+  password: process.env.DB_PASSWORD, // Use DB_PASSWORD from .env file
+  database: process.env.DB_NAME      // Use DB_NAME from .env file
 });
 
 // Connect to MySQL database
@@ -26,13 +27,13 @@ db.connect(err => {
   }
 });
 
-// Customer Management API URL (replace with the actual URL of the customer service)
-const customerApiUrl = 'https://0a98-196-200-133-154.ngrok-free.app/customer'; // Replace with the actual URL of your Customer Management API
+// Customer Management API URL (from .env file)
+const customerApiUrl = process.env.CUSTOMER_API_URL;
 
 // Function to check if the owner exists in the Customer Management API
 const checkOwnerExists = async (owner_id) => {
   try {
-    const response = await axios.get(`${customerApiUrl}/${owner_id}`);
+    const response = await axios.get(`${customerApiUrl}/customer/${owner_id}`);
     if (response.status === 200) {
       return true; // Owner exists
     }
