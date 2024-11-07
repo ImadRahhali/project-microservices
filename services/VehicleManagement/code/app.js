@@ -2,45 +2,36 @@ const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000; // Use PORT from .env file
+const port = process.env.PORT || 3000;
 
 // Middleware to parse JSON request bodies
 app.use(bodyParser.json());
 
-// MySQL database connection
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,         // Use DB_HOST from .env file
-  user: process.env.DB_USER,         // Use DB_USER from .env file
-  password: process.env.DB_PASSWORD, // Use DB_PASSWORD from .env file
-  database: process.env.DB_NAME      // Use DB_NAME from .env file
-});
+// MySQL connection pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,    // Wait for a connection if all are busy
+  connectionLimit: 10,          // Maximum number of connections in the pool
+  queueLimit: 0                 // Unlimited number of queued connection requests
+}).promise();                   // Enable promise-based syntax
 
-// Connect to MySQL database
-db.connect(err => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-  } else {
-    console.log('Connected to MySQL database');
-  }
-});
-
-// Customer Management API URL (from .env file)
+// Customer Management API URL
 const customerApiUrl = process.env.CUSTOMER_API_URL;
 
 // Function to check if the owner exists in the Customer Management API
 const checkOwnerExists = async (owner_id) => {
   try {
     const response = await axios.get(`${customerApiUrl}/customer/${owner_id}`);
-    if (response.status === 200) {
-      return true; // Owner exists
-    }
+    return response.status === 200;
   } catch (error) {
     return false; // Owner does not exist or error occurred
   }
-  return false;
 };
 
 // API endpoint to create a new vehicle
@@ -56,42 +47,40 @@ app.post('/vehicles', async (req, res) => {
   const query = 'INSERT INTO vehicles (vin, registration_number, brand, model, year, color, mileage, fuel_type, purchase_date, owner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   const values = [vin, registration_number, brand, model, year, color, mileage, fuel_type, purchase_date, owner_id, status];
 
-  db.execute(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const [result] = await pool.execute(query, values);
     res.status(201).json({ message: 'Vehicle added successfully', vehicle_id: result.insertId });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API endpoint to get a list of vehicles
-app.get('/vehicles', (req, res) => {
+app.get('/vehicles', async (req, res) => {
   const query = 'SELECT * FROM vehicles';
 
-  db.execute(query, (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const [results] = await pool.execute(query);
     res.status(200).json(results);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API endpoint to get a vehicle by ID
-app.get('/vehicles/:id', (req, res) => {
+app.get('/vehicles/:id', async (req, res) => {
   const vehicleId = req.params.id;
-
   const query = 'SELECT * FROM vehicles WHERE id = ?';
-  db.execute(query, [vehicleId], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
 
+  try {
+    const [result] = await pool.execute(query, [vehicleId]);
     if (result.length === 0) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-
     res.status(200).json(result[0]);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API endpoint to update vehicle information
@@ -108,17 +97,15 @@ app.put('/vehicles/:id', async (req, res) => {
   const query = 'UPDATE vehicles SET vin = ?, registration_number = ?, brand = ?, model = ?, year = ?, color = ?, mileage = ?, fuel_type = ?, purchase_date = ?, owner_id = ?, status = ? WHERE id = ?';
   const values = [vin, registration_number, brand, model, year, color, mileage, fuel_type, purchase_date, owner_id, status, vehicleId];
 
-  db.execute(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
+  try {
+    const [result] = await pool.execute(query, values);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-
     res.status(200).json({ message: 'Vehicle updated successfully' });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API endpoint to delete a vehicle
@@ -127,11 +114,8 @@ app.delete('/vehicles/:id', async (req, res) => {
 
   // Get the owner_id from the vehicle before deleting
   const query = 'SELECT owner_id FROM vehicles WHERE id = ?';
-  db.execute(query, [vehicleId], async (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
+  try {
+    const [result] = await pool.execute(query, [vehicleId]);
     if (result.length === 0) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
@@ -146,14 +130,11 @@ app.delete('/vehicles/:id', async (req, res) => {
 
     // Proceed with deletion
     const deleteQuery = 'DELETE FROM vehicles WHERE id = ?';
-    db.execute(deleteQuery, [vehicleId], (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      res.status(200).json({ message: 'Vehicle deleted successfully' });
-    });
-  });
+    await pool.execute(deleteQuery, [vehicleId]);
+    res.status(200).json({ message: 'Vehicle deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start the Express server
