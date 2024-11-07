@@ -88,6 +88,20 @@ def update_customer():
     if rows_affected == 0:
         return jsonify({"error": "Customer not found or no update performed"}), 404
     return jsonify({"message": "Customer updated successfully"}), 200
+@app.route('/customer/<cin>', methods=['GET'])
+def get_customer_by_cin(cin):
+    # Retrieve customer details by CIN from the database
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers WHERE CIN = %s", (cin,))
+    customer = cursor.fetchone()
+    cursor.close()
+    connection.close()
 
+    # If customer exists, return customer details
+    if customer:
+        return jsonify({"customer": customer}), 200
+    else:
+        return jsonify({"message": "Customer not found"}), 404
 if __name__ == "__main__":
     app.run(debug=True)
