@@ -29,7 +29,7 @@ In the project directory, you will find an `.env` file. Before running the appli
 
 Create or modify the `.env` files in the root of the customer-service and vehicle-service folders (if it does not already exist) with the following contents:
 
-#### customer-service Folder :
+#### Add `.env` in customer-service Folder :
 
 ```env
 # MySQL connection URLs for the services
@@ -37,7 +37,7 @@ DATABASE_URL="mysql://root:RootPasswordHere@mysql-customer:3306/customer_db"
 ```
 change `RootPasswordHere` by your own root password.
 
-#### vehicle-service Folder :
+#### Add `.env` in vehicle-service Folder :
 
 ```env
 # MySQL connection URLs for the services
@@ -51,7 +51,7 @@ You need to do changes on the `docker-compose.yaml` file:
 
 The MySQL services for both `customer-service` and `vehicle-service` need to have their environment variables properly configured with the same root password you set in the `.env` files. Ensure the `MYSQL_ROOT_PASSWORD` values in the Docker Compose configuration match the password you used in your `.env` files.
 
-#### MySQL Configuration for customer-service:
+#### MySQL Configuration for customer-service in `docker-compose.yaml`:
 
 ```yaml
 mysql-customer:
@@ -60,7 +60,7 @@ mysql-customer:
     MYSQL_ROOT_PASSWORD: RootPasswordHere  # Change to your custom root password
     MYSQL_DATABASE: customer_db
 ```
-#### MySQL Configuration for vehicle-service:
+#### MySQL Configuration for vehicle-service in `docker-compose.yaml`:
 
 ```yaml
 mysql-vehicle:
@@ -69,6 +69,29 @@ mysql-vehicle:
     MYSQL_ROOT_PASSWORD: RootPasswordHere  # Change to your custom root password
     MYSQL_DATABASE: vehicle_db
 ```
+#### Database URL Configuration for customer-service in `docker-compose.yaml`:
+
+```yaml
+customer-service:
+    build:
+      context: ./customer-service
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-customer:3306/customer_db" # Change RootPasswordHere to your custom root password
+```
+#### Database URL Configuration for vehicle-service in `docker-compose.yaml`:
+
+```yaml
+  vehicle-service:
+    build:
+      context: ./vehicle-service
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-vehicle:3306/vehicle_db" # Change RootPasswordHere to your custom root password
+```
+#### Optional:
 
 If you need to change the ports or other Docker Compose configurations, update the `docker-compose.yml` file. Here are some common adjustments:
 
