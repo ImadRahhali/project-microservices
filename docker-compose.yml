@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # MySQL container for Customer Service
+  mysql-customer:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPasswordHere
+      MYSQL_DATABASE: customer_db
+    volumes:
+      - customer_db_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MySQL container for Vehicle Service
+  mysql-vehicle:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPasswordHere
+      MYSQL_DATABASE: vehicle_db
+    volumes:
+      - vehicle_db_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Customer Service container
+  customer-service:
+    build:
+      context: ./customer-service
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-customer:3306/customer_db"
+    depends_on:
+      mysql-customer:
+        condition: service_healthy
+    restart: on-failure
+    volumes:
+      - ./customer-service:/app
+    networks:
+      - app-network
+    command: >
+      /bin/sh -c "
+        npx prisma migrate deploy &&
+        npx prisma generate &&
+        npm run start"
+
+  # Vehicle Service container 
+  vehicle-service:
+    build:
+      context: ./vehicle-service
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-vehicle:3306/vehicle_db"
+    depends_on:
+      mysql-vehicle:
+        condition: service_healthy
+    restart: on-failure
+    volumes:
+      - ./vehicle-service:/app
+    networks:
+      - app-network
+    command: >
+      /bin/sh -c "
+        npx prisma migrate deploy &&
+        npx prisma generate &&
+        npm run start"
+
+volumes:
+  customer_db_data:
+    driver: local
+  vehicle_db_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

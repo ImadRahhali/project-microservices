@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  id                 String   @id // VIN is the primary key
+  registrationNumber String   @unique
+  brand              String
+  model              String
+  year               Int
+  color              String
+  mileage            Int
+  fuelType           String
+  purchaseDate       DateTime
+  ownerId            String // CIN from Customer Service
+  status             String
+}
