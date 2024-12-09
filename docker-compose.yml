@@ -6,8 +6,8 @@ services:
     image: mysql:8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: RootPasswordHere # Change to your custom root password
-      MYSQL_DATABASE: customer_db
+      MYSQL_ROOT_PASSWORD: root # Change to your custom root password
+      MYSQL_DATABASE: customers_database
     volumes:
       - customer_db_data:/var/lib/mysql
     networks:
@@ -23,8 +23,8 @@ services:
     image: mysql:8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: RootPasswordHere # Change to your custom root password
-      MYSQL_DATABASE: vehicle_db
+      MYSQL_ROOT_PASSWORD: root # Change to your custom root password
+      MYSQL_DATABASE: vehicles_database
     volumes:
       - vehicle_db_data:/var/lib/mysql
     networks:
@@ -42,7 +42,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-customer:3306/customer_db" # Change RootPasswordHere to your custom root password
+      DATABASE_URL: "mysql://root:root@mysql-customer:3306/customers_database" # Change RootPasswordHere to your custom root password
     depends_on:
       mysql-customer:
         condition: service_healthy
@@ -64,7 +64,7 @@ services:
     ports:
       - "4000:4000"
     environment:
-      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-vehicle:3306/vehicle_db" # Change RootPasswordHere to your custom root password
+      DATABASE_URL: "mysql://root:root@mysql-vehicle:3306/vehicles_database" # Change RootPasswordHere to your custom root password
     depends_on:
       mysql-vehicle:
         condition: service_healthy
