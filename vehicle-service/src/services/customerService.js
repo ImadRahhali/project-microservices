@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const CUSTOMER_SERVICE_URL = process.env.CUSTOMER_SERVICE_URL || 'http://localhost:3000/customers';
+const CUSTOMER_SERVICE_URL = "http://customer-service:3000/customers" || 'http://localhost:3000/customers';
 
 exports.getCustomerById = async (id) => {
   try {
