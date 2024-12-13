@@ -4,6 +4,8 @@ FROM node:18-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
+RUN apk add --no-cache openssl
+
 # Copy package.json and package-lock.json to utilize Docker caching
 COPY package.json package-lock.json ./
 

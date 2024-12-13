@@ -1,0 +1,19 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Schedule {
+  id          Int      @id @default(autoincrement())
+  startTime   DateTime
+  endTime     DateTime
+  description String
+  status      String
+  vehicleId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

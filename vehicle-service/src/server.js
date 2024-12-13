@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const vehicleRoutes = require('./routes/vehicleRoutes');
-const { errorHandler } = require('../utils/errorHandler');
+const { errorHandler } = require('./utils/errorHandler');
 
 const app = express();
 
