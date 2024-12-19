@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 
 // Kafka client and producer setup
 const client = new kafka.KafkaClient({  
-kafkaHost: 'kafka:9092',
-requestTimeout: 60000
-}); // Kafka service in Docker
+    kafkaHost: 'kafka:9092',
+    requestTimeout: 60000
+});
 const producer = new kafka.Producer(client);
 
 // Function to publish events to Kafka
@@ -120,7 +120,7 @@ const updateSchedule = async (req, res) => {
         // Prepare the Kafka message to send (e.g., for notifications)
         const notificationMessage = {
             type: 'schedule-updated',  // Event type for updates
-            customerId: existingSchedule.vehicleId,  // Using the existing schedule's vehicleId
+            customerId: existingSchedule.vehicleId,
             vehicleId: existingSchedule.vehicleId,
             startTime,
             endTime,
@@ -155,7 +155,7 @@ const deleteSchedule = async (req, res) => {
         // Prepare the Kafka message to send (e.g., for notifications)
         const notificationMessage = {
             type: 'schedule-deleted',  // Event type for deletion
-            customerId: existingSchedule.vehicleId,  // Using the existing schedule's vehicleId
+            customerId: existingSchedule.vehicleId,
             vehicleId: existingSchedule.vehicleId,
             id, // Include the deleted schedule ID
         };
@@ -169,10 +169,44 @@ const deleteSchedule = async (req, res) => {
     }
 };
 
+// PATCH request to mark schedule as notified
+const markAsNotified = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const schedule = await prisma.schedule.findUnique({
+            where: { id: parseInt(id) },
+        });
+
+        if (!schedule) {
+            return res.status(404).json({ error: "Schedule not found" });
+        }
+
+        const updatedSchedule = await prisma.schedule.update({
+            where: { id: parseInt(id) },
+            data: { status: "notified" },
+        });
+
+        const notificationMessage = {
+            type: 'schedule-notified',  
+            scheduleId: updatedSchedule.id,
+            status: updatedSchedule.status,
+            customerId: updatedSchedule.vehicleId,
+        };
+
+        publishNotificationEvent(notificationMessage);
+
+        res.status(200).json(updatedSchedule);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getAllSchedules,
     getScheduleById,
     createSchedule,
     updateSchedule,
     deleteSchedule,
+    markAsNotified,  // Export the new function
 };
