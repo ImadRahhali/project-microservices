@@ -4,22 +4,27 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 dotenv.config();
 
-const vehicleRoutes = require('./routes/vehicleRoutes');
+const billingRoutes = require('./routes/billingRoutes.js');
+const ScheduleChecker = require('./services/scheduleChecker');
 const { errorHandler } = require('./utils/errorHandler');
 
 const app = express();
 
+// Enable CORS for all origins
 app.use(cors());
+
 // Middleware
 app.use(bodyParser.json());
 
 // Routes
-app.use('/vehicles', vehicleRoutes);
+app.use('/billing', billingRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 4000;
+ScheduleChecker.start();
+
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
-  console.log(`Vehicle Service running on port ${PORT}`);
+  console.log(`Billing Service running on port ${PORT}`);
 });

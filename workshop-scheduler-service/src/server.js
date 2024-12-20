@@ -1,12 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const cors = require('cors');
 dotenv.config();
 
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const { errorHandler } = require('./utils/errorHandler');
 
 const app = express();
+
+app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
