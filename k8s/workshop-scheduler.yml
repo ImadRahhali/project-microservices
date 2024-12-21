@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshop-scheduler-service
+  namespace: microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: workshop-scheduler-service
+  template:
+    metadata:
+      labels:
+        app: workshop-scheduler-service
+    spec:
+      containers:
+        - name: workshop-scheduler-service
+          image: workshop-scheduler-service:latest
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workshop-scheduler-service
+  namespace: microservices
+spec:
+  selector:
+    app: workshop-scheduler-service
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

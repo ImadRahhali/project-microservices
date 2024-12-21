@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # MySQL container for Customer Service
   mysql-customer:
     image: mysql:8
     restart: always
@@ -13,7 +12,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -30,7 +29,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -46,10 +45,11 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5
+
   # Customer Service container
   customer-service:
     build:
@@ -72,7 +72,7 @@ services:
         npx prisma generate &&
         npm run start"
 
-  # Vehicle Service container 
+  # Vehicle Service container
   vehicle-service:
     build:
       context: ./vehicle-service
@@ -104,7 +104,7 @@ services:
       KAFKA_HOST: kafka:9092 # Make sure this matches the internal Kafka hostname and port
     depends_on:
       - mysql-schedule
-      - kafka 
+      - kafka
     restart: on-failure
     volumes:
       - ./workshop-scheduler-service:/app
@@ -116,7 +116,8 @@ services:
         npx prisma generate &&
         npm run start"
     healthcheck:
-      test: ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "kafka:9092"]
+      test:
+        ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "kafka:9092"]
       interval: 30s
       retries: 5
 
@@ -133,6 +134,7 @@ services:
       ZOOKEEPER_SERVERS: zoo1:2888:3888
     networks:
       - app-network
+
   kafka:
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka
@@ -168,10 +170,10 @@ services:
     restart: always
     networks:
       - app-network
-    command: [ "node", "src/server.js" ]
-    # Ensure Kafka is ready before starting the service
+    command: ["node", "src/server.js"]
     healthcheck:
-      test: ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "kafka:9092"]
+      test:
+        ["CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "kafka:9092"]
       interval: 30s
       retries: 5
 
@@ -183,9 +185,21 @@ services:
     restart: always
     networks:
       - app-network
-    command: [ "node", "src/server.js" ]
+    command: ["node", "src/server.js"]
 
-
+  frontend:
+    build:
+      context: ./frontend # Le répertoire où se trouve le Dockerfile
+    ports:
+      - "5173:5173" # Mappe le port 5173 du conteneur au port 5173 localement
+    volumes:
+      - ./frontend:/app # Monte le répertoire local ./frontend dans le conteneur
+    environment:
+      - NODE_ENV=development # Optionnel : définissez l'environnement
+    working_dir: /app # Répertoire de travail dans le conteneur
+    command: npm run dev # Commande pour démarrer le serveur de développement si nécessaire
+    networks:
+      - app-network # Optionnel : si vous avez un réseau personnalisé
 
 volumes:
   customer_db_data:
