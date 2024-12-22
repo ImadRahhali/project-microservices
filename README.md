@@ -1,175 +1,81 @@
+# 🚗 Système de Gestion de Garage Microservices
 
----
 
-# Microservices Project - Customer and Vehicle Services
+## 📋 À propos
 
-This project consists of two microservices: Customer Service and Vehicle Service, each of which uses a MySQL database. The services are built using Node.js and Prisma, and Docker Compose is used to orchestrate the containers.
+SmartGarage est une application de gestion de garage automobile moderne basée sur une architecture microservices. Elle permet aux employés de gérer efficacement les opérations quotidiennes d'un atelier de réparation automobile, depuis la gestion des clients jusqu'à la planification des interventions.
 
-## Prerequisites
+## ✨ Fonctionnalités Principales
 
-Before you begin, ensure you have the following installed:
-- **Docker**: [Docker Installation Guide](https://docs.docker.com/get-docker/)
-- **Docker Compose**: [Docker Compose Installation Guide](https://docs.docker.com/compose/install/)
-- **Git**: [Git Installation Guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+### 👥 Gestion des Clients
+- Création et modification des profils clients
+- Suivi des informations personnelles (identité, contact)
+- Interface intuitive de recherche et de gestion
 
-## Setting up the Project
+### 🚙 Gestion des Véhicules
+- Enregistrement détaillé des véhicules
+- Suivi de l'historique des interventions
+- Gestion des informations techniques (VIN, kilométrage, etc.)
 
-### 1. Clone the Repository
+### 📅 Planification de l'Atelier
+- Planning des interventions
+- Suivi en temps réel des travaux
+- Gestion des ressources de l'atelier
 
-Clone the repository to your local machine:
+### 📨 Système de Notifications
+- Alertes automatiques pour les interventions planifiées
+- Envoi de factures par email/SMS
+- Communication proactive avec les clients
 
-```bash
-git clone https://github.com/TahirRida/project-microservices.git
-cd project-microservices
-```
+## 🛠 Architecture Technique
 
-### 2. Configure the `.env` File
+### Frontend
+- Single Page Application (SPA) 
+- Interface utilisateur responsive
+- Design System professionnel
 
-In the project directory, you will find an `.env` file. Before running the application, you need to update the database URLs and other environment-specific variables.
+### Backend
+- Microservices développés en Node.js
+- Communication asynchrone inter-services
+- Base de données MySQL avec Prisma ORM pour chaque service
 
-Create or modify the `.env` files in the root of the customer-service and vehicle-service folders (if it does not already exist) with the following contents:
+### Infrastructure
+- Docker pour la conteneurisation
+- Kubernetes pour l'orchestration
+- Istio pour le service mesh
+- API Gateway pour la gestion centralisée des requêtes
 
-#### Add `.env` in customer-service Folder :
+## 📊 Fonctionnalités DevOps
 
-```env
-# MySQL connection URLs for the services
-DATABASE_URL="mysql://root:RootPasswordHere@mysql-customer:3306/customer_db"
-```
-change `RootPasswordHere` by your own root password.
+### Déploiement
+- Stratégies Canary et Blue-Green
+- Déploiement zero-downtime
+- Conteneurisation avec Docker
 
-#### Add `.env` in vehicle-service Folder :
+### Monitoring
+- Visualisation des services avec Istio
+- Surveillance des performances
+- Traçage distribué
+- Logging centralisé
 
-```env
-# MySQL connection URLs for the services
-DATABASE_URL="mysql://root:RootPasswordHere@mysql-vehicle:3306/vehicle_db"
-CUSTOMER_SERVICE_URL="http://customer-service:3000/customers"
-```
-change `RootPasswordHere` by your own root password.
-### 3. Modify Docker Compose Configuration
+### Sécurité
+- Communication mTLS avec Istio
+- Circuit Breaking
+- Gestion des accès sécurisée
 
-You need to do changes on the `docker-compose.yaml` file:
+## 📈 État du Projet
 
-The MySQL services for both `customer-service` and `vehicle-service` need to have their environment variables properly configured with the same root password you set in the `.env` files. Ensure the `MYSQL_ROOT_PASSWORD` values in the Docker Compose configuration match the password you used in your `.env` files.
+- [x] Architecture microservices
+- [x] Implementation des services core en Node.js
+- [x] Frontend SPA
+- [x] API Gateway
+- [x] Déploiement Kubernetes
+- [x] Intégration Istio
+- [x] Base de données MySQL avec Prisma
 
-#### MySQL Configuration for customer-service in `docker-compose.yaml`:
+## 👥 Équipe
 
-```yaml
-mysql-customer:
-  image: mysql:8
-  environment:
-    MYSQL_ROOT_PASSWORD: RootPasswordHere  # Change to your custom root password
-    MYSQL_DATABASE: customer_db
-```
-#### MySQL Configuration for vehicle-service in `docker-compose.yaml`:
-
-```yaml
-mysql-vehicle:
-  image: mysql:8
-  environment:
-    MYSQL_ROOT_PASSWORD: RootPasswordHere  # Change to your custom root password
-    MYSQL_DATABASE: vehicle_db
-```
-#### Database URL Configuration for customer-service in `docker-compose.yaml`:
-
-```yaml
-customer-service:
-    build:
-      context: ./customer-service
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-customer:3306/customer_db" # Change RootPasswordHere to your custom root password
-```
-#### Database URL Configuration for vehicle-service in `docker-compose.yaml`:
-
-```yaml
-  vehicle-service:
-    build:
-      context: ./vehicle-service
-    ports:
-      - "4000:4000"
-    environment:
-      DATABASE_URL: "mysql://root:RootPasswordHere@mysql-vehicle:3306/vehicle_db" # Change RootPasswordHere to your custom root password
-```
-#### Optional:
-
-If you need to change the ports or other Docker Compose configurations, update the `docker-compose.yml` file. Here are some common adjustments:
-
-- **Ports**: If you need to run the services on different ports, modify the `ports` section for `customer-service` and `vehicle-service` services in the `docker-compose.yml` file.
-  
-Example to change ports:
-```yaml
-  customer-service:
-    ports:
-      - "3001:3000"
-  vehicle-service:
-    ports:
-      - "4001:4000"
-```
-
-### 4. Build and Run the Services
-
-After configuring the `.env` file and Docker Compose file, you're ready to start the services using Docker Compose.
-
-Run the following command to build and start the services:
-
-```bash
-docker-compose up --build
-```
-
-This will:
-- Build the Docker images for both `customer-service` and `vehicle-service` from the provided Dockerfiles.
-- Start MySQL containers for both customer and vehicle services.
-- Start the customer and vehicle services containers.
-
-### 5. Verify the Services
-
-Once the containers are up and running, you can verify the services by making API requests.
-
-- **Customer Service**: Open `http://localhost:3000` or `http://localhost:3001` (depending on the port configuration) to interact with the Customer Service API.
-- **Vehicle Service**: Open `http://localhost:4000` or `http://localhost:4001` (depending on the port configuration) to interact with the Vehicle Service API.
-
-You can use tools like **Postman** or **cURL** to make requests.
-
-### 6. Manage the Docker Containers
-
-- To stop the services, run:
-  ```bash
-  docker-compose down
-  ```
-- To view the logs for all services, run:
-  ```bash
-  docker-compose logs -f
-  ```
-
-### 7. Prisma Migrations and Setup
-
-Both services use Prisma for database management. The first time you run the application, Prisma will automatically migrate the databases for both services using the `npx prisma migrate deploy` command specified in the Docker Compose file. However, if you need to run migrations manually for any reason, you can do so by running:
-
-```bash
-docker-compose exec customer-service /bin/sh -c "npx prisma migrate dev"
-docker-compose exec vehicle-service /bin/sh -c "npx prisma migrate dev"
-```
-
-### 8. Debugging and Troubleshooting
-
-- If the services fail to start, check the logs to identify the problem:
-  ```bash
-  docker-compose logs
-  ```
-- Ensure the environment variables in the `.env` file are set correctly.
-- Make sure the services are properly connecting to their respective MySQL databases.
-
-### 9. Optional: Test API Endpoints
-
-You can test the following API endpoints:
-
-**Customer Service**
-- `POST /customers`: Add a new customer.
-- `GET /customers/{id}`: Get a customer by ID.
-
-**Vehicle Service**
-- `POST /vehicles`: Add a new vehicle.
-- `GET /vehicles/{id}`: Get a vehicle by VIN.
+- [Rahhali Imad](https://github.com/ImadRahhali)
+- [Tahir Rida](https://github.com/TahirRida)
 
 ---
