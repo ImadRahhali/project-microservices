@@ -1,81 +1,59 @@
-# 🚗 Système de Gestion de Garage Microservices
-
-
-## 📋 À propos
-
-SmartGarage est une application de gestion de garage automobile moderne basée sur une architecture microservices. Elle permet aux employés de gérer efficacement les opérations quotidiennes d'un atelier de réparation automobile, depuis la gestion des clients jusqu'à la planification des interventions.
-
-## ✨ Fonctionnalités Principales
-
-### 👥 Gestion des Clients
-- Création et modification des profils clients
-- Suivi des informations personnelles (identité, contact)
-- Interface intuitive de recherche et de gestion
-
-### 🚙 Gestion des Véhicules
-- Enregistrement détaillé des véhicules
-- Suivi de l'historique des interventions
-- Gestion des informations techniques (VIN, kilométrage, etc.)
-
-### 📅 Planification de l'Atelier
-- Planning des interventions
-- Suivi en temps réel des travaux
-- Gestion des ressources de l'atelier
-
-### 📨 Système de Notifications
-- Alertes automatiques pour les interventions planifiées
-- Envoi de factures par email/SMS
-- Communication proactive avec les clients
-
-## 🛠 Architecture Technique
-
+# 🚗 Smart Garage Microservices Management System
+## 📋 About
+SmartGarage is a modern automotive garage management application based on a microservices architecture. It allows employees to efficiently manage the daily operations of an auto repair shop, from customer management to service scheduling.
+## ✨ Main Features
+### 👥 Customer Management
+- Creation and modification of customer profiles
+- Tracking of personal information (identity, contact)
+- Intuitive search and management interface
+### 🚙 Vehicle Management
+- Detailed vehicle registration
+- Service history tracking
+- Technical information management (VIN, mileage, etc.)
+### 📅 Workshop Planning
+- Service scheduling
+- Real-time work tracking
+- Workshop resource management
+### 📨 Notification System
+- Automatic alerts for scheduled services
+- Invoice delivery via email/SMS
+- Proactive customer communication
+## 🛠 Technical Architecture
 ### Frontend
 - Single Page Application (SPA) 
-- Interface utilisateur responsive
-- Design System professionnel
-
+- Responsive user interface
+- Professional Design System
 ### Backend
-- Microservices développés en Node.js
-- Communication asynchrone inter-services
-- Base de données MySQL avec Prisma ORM pour chaque service
-
+- Microservices developed in Node.js
+- Asynchronous inter-service communication
+- MySQL database with Prisma ORM for each service
 ### Infrastructure
-- Docker pour la conteneurisation
-- Kubernetes pour l'orchestration
-- Istio pour le service mesh
-- API Gateway pour la gestion centralisée des requêtes
-
-## 📊 Fonctionnalités DevOps
-
-### Déploiement
-- Stratégies Canary et Blue-Green
-- Déploiement zero-downtime
-- Conteneurisation avec Docker
-
+- Docker for containerization
+- Kubernetes for orchestration
+- Istio for service mesh
+- API Gateway for centralized request management
+## 📊 DevOps Features
+### Deployment
+- Canary and Blue-Green strategies
+- Zero-downtime deployment
+- Docker containerization
 ### Monitoring
-- Visualisation des services avec Istio
-- Surveillance des performances
-- Traçage distribué
-- Logging centralisé
-
-### Sécurité
-- Communication mTLS avec Istio
+- Service visualization with Istio
+- Performance monitoring
+- Distributed tracing
+- Centralized logging
+### Security
+- mTLS communication with Istio
 - Circuit Breaking
-- Gestion des accès sécurisée
-
-## 📈 État du Projet
-
-- [x] Architecture microservices
-- [x] Implementation des services core en Node.js
-- [x] Frontend SPA
+- Secure access management
+## 📈 Project Status
+- [x] Microservices architecture
+- [x] Core services implementation in Node.js
+- [x] SPA Frontend
 - [x] API Gateway
-- [x] Déploiement Kubernetes
-- [x] Intégration Istio
-- [x] Base de données MySQL avec Prisma
-
-## 👥 Équipe
-
+- [x] Kubernetes deployment
+- [x] Istio integration
+- [x] MySQL database with Prisma
+## 👥 Team
 - [Rahhali Imad](https://github.com/ImadRahhali)
 - [Tahir Rida](https://github.com/TahirRida)
-
----
